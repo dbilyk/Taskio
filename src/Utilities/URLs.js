@@ -1,3 +1,5 @@
+import TOKEN from "./GIT_TOKEN" 
+
 let strings = {
   iconURL:{
     addTask:"/img/icon/add-task.png",
@@ -10,7 +12,8 @@ let strings = {
     tag:"/img/icon/tag.png",
     time:"/img/icon/time.png",
     zen:"/img/icon/Z.png",
-  }
+  },
+  gitAPI:"https://api.github.com/repos/dbilyk/taskio/contents/src/TASK_DATA.json?access_token=" + TOKEN
 }
 
 export default strings

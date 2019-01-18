@@ -1,6 +1,6 @@
 import React from 'react';
 import FooterButton from "./FooterButton"
-import strings from "../Utilities/strings"
+import URLs from "../Utilities/URLs"
 
 import injectSheet from "react-jss"
 
@@ -99,10 +99,10 @@ let Task = (
 
 
   let root = window.location.origin
-  let timeIconURL = root + strings.iconURL.time
-  let tagIconURL = root + strings.iconURL.tag
-  let completedIconURL = root + strings.iconURL.completeTask
-  let grabberIconURL = root + strings.iconURL.grabber
+  let timeIconURL = root + URLs.iconURL.time
+  let tagIconURL = root + URLs.iconURL.tag
+  let completedIconURL = root + URLs.iconURL.completeTask
+  let grabberIconURL = root + URLs.iconURL.grabber
 
   return (  
     <div className = {classes.taskContainer} >

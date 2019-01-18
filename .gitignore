@@ -11,7 +11,10 @@
 # production
 /build
 
+
+
 # misc
+GIT_TOKEN.js
 .DS_Store
 .env.local
 .env.development.local
