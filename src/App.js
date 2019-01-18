@@ -2,19 +2,14 @@ import React, { Component } from 'react';
 import './App.css';
 
 import API from "./Utilities/API"
-import ProjectContainer from "./Components/ProjectContainer"
+import ProjectsContainer from "./Components/ProjectsContainer"
 
 
 class App extends Component {
-
-  componentDidMount(){
-    API.GET_STATE()
-  }
-
   render() {
     return (
       <div className="App">
-        <ProjectContainer />
+        <ProjectsContainer />
         
         
       </div>

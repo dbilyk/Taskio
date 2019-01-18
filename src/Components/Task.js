@@ -24,10 +24,6 @@ const styles = {
     "& span": {
       maxWidth:"9vw"
     }
-
-
-
-
   },
   checkmarkDiv:{
     display:"flex",
@@ -53,30 +49,31 @@ const styles = {
   },
   dividerLine:{
     borderBottom:"1px solid #eee",
-    marginTop:'4px',
-    marginBottom:'4px',
     
   },
   footerRow:{
     display:"flex",
     alignItems:"center",
-    padding:"4px",
-    paddingBottom:'8px'
+    
   },
   pointsField:{
     flex:"0 0 auto",
+    boxShadow:"none",
     width:"30px",
     borderRadius:"8px",
+    border:"1px solid #eee",
     textAlign:"center",
     margin:'0 20px'
   },
   grabberIcon:{
-    width:'24px',
-    height:'12px',
+    width:'16px',
+    height:'8px',
     opacity:"0.2",
-    margin: "0 22px 0 8px"
+    margin: "0 22px 0 12px"
+  },
+  hide:{
+    display:"none"
   }
-  
   
 }
 
@@ -89,7 +86,7 @@ let Task = (
     description, 
     points, 
     due,
-    ID,
+    id,
     isComplete, 
     isExpanded, 
     isShowing,
@@ -104,12 +101,14 @@ let Task = (
   let completedIconURL = root + URLs.iconURL.completeTask
   let grabberIconURL = root + URLs.iconURL.grabber
 
+  let footerClasses = (zenEnabled)?classes.footerRow + " " +classes.hide:classes.footerRow
+
   return (  
     <div className = {classes.taskContainer} >
       <div className = {classes.taskRow}>
 
         <div className = {classes.checkmarkDiv}>
-          <img className = {classes.completedIcon} src = {completedIconURL} alt =""/>
+          {(isComplete)?(<img className = {classes.completedIcon} src = {completedIconURL} alt =""/>):<i></i>}
         </div>
 
         <div contentEditable="true" className = {classes.titleField}>{text}</div>
@@ -117,7 +116,7 @@ let Task = (
       </div>
       <div className={classes.dividerLine}></div>
 
-      <div className = {classes.footerRow}>
+      <div className = {footerClasses}>
 
         <a href="#">
           <img className = {classes.grabberIcon} src={grabberIconURL} alt=""/>
@@ -127,7 +126,7 @@ let Task = (
           text="Add Tags" 
           iconURL={tagIconURL}
           isShowing= {!zenEnabled && due}
-          callback={()=>{console.log("tag adder")}}
+          callback={()=>{console.log("tag adder id:"+id)}}
         />
 
         <FooterButton 

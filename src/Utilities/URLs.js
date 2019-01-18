@@ -1,4 +1,4 @@
-import TOKEN from "./GIT_TOKEN" 
+import GIT_CREDENTIALS from "./GIT_TOKEN" 
 
 let strings = {
   iconURL:{
@@ -13,7 +13,7 @@ let strings = {
     time:"/img/icon/time.png",
     zen:"/img/icon/Z.png",
   },
-  gitAPI:"https://api.github.com/repos/dbilyk/taskio/contents/src/TASK_DATA.json?access_token=" + TOKEN
+  gitAPI:"https://api.github.com/repos/"+ GIT_CREDENTIALS.username+"/"+GIT_CREDENTIALS.repoName+"/contents/src/TASK_DATA.json?access_token=" + GIT_CREDENTIALS.token
 }
 
 export default strings

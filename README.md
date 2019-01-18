@@ -1,5 +1,19 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+
+## Setup
+
+Need to create a file called GIT_TOKEN.js in src folder like as follows:
+```
+let GIT_CREDENTIALS = {
+  token:'YOUR GITHUB REPO TOKEN',
+  username: "YOUR GITHUB USERNAME",
+  repoName: "YOUR REPO NAME"
+}
+export default GIT_CREDENTIALS
+```
+
+
 ## Available Scripts
 
 In the project directory, you can run:
