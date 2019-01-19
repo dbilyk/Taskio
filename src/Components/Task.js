@@ -91,7 +91,15 @@ let Task = (
     footerIsShowing,
     actionMenuIsOpen,
     zenEnabled,
-    tags
+    tags,
+    onToggleTaskMenu,
+    onComplete,
+    onEditDate,
+    onEditPoints,
+    onEditTags,
+    onDrag,
+    onEditContent,
+    onDeleteTask
   }) => {
 
 
@@ -107,11 +115,18 @@ let Task = (
     <div className = {classes.taskContainer} >
       <div className = {classes.taskRow}>
 
-        <div className = {classes.checkmarkDiv}>
+        <div className = {classes.checkmarkDiv} onClick={()=>{onComplete(id)}}>
           {(isComplete)?(<img className = {classes.completedIcon} src = {completedIconURL} alt =""/>):<i></i>}
         </div>
 
-        <div contentEditable="true" className = {classes.titleField}>{text}</div>
+        <input 
+          type= 'text' 
+          className = {classes.titleField}
+          onChange={(e)=>{onEditContent(e, id)}}
+          value = {text}
+        >
+          
+        </input>
 
       </div>
       <div className={classes.dividerLine}></div>
@@ -123,8 +138,8 @@ let Task = (
         </a>
 
         <input 
-          className={(points!="")?classes.pointsField: classes.pointsField + " "+ classes.hide} 
-          type="text" 
+          className={classes.pointsField + ((points == "" && !actionMenuIsOpen)?" " + classes.hide:"")} 
+          type="text"
           value={points}
           placeholder="pts"
         />
