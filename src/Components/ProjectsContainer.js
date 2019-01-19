@@ -26,7 +26,9 @@ class ProjectsContainer extends Component {
       ],
     
       //tasks array
-      tasks:[
+      tasks:{
+
+      }
         
       ]
     }
@@ -64,7 +66,6 @@ class ProjectsContainer extends Component {
     }
 
     let taskObject = {
-      id                : findHighestId(this.state.tasks)+1,
       owningProjectId   : this.state.currentProjectId,
       text              : "Demo Task",
       description       : "",
@@ -84,8 +85,11 @@ class ProjectsContainer extends Component {
       onToggleActionMenu: this.onToggleActionMenu.bind(this)
     }
 
+    let newState = this.state
+    newState.tasks[findHighestId(Object.keys(this.state.tasks))+1]
+
     this.setState({
-      tasks:[taskObject,...this.state.tasks]},
+      tasks:this.state.tasks,
       ()=>{
         API.PUT(this.state)
       })
@@ -108,7 +112,8 @@ class ProjectsContainer extends Component {
     }
     onEditContent(event,taskID){
       console.log('onEditContent:'+ taskID)
-      console.log(event.nativeEvent)
+
+      console.log(event.target.value)
     }
     onDeleteTask(taskID){
       console.log('onDeleteTask:'+ taskID)
