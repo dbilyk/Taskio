@@ -72,10 +72,10 @@ function API(){
   }
   
 
-  //makes sure that the most recent PUT state gets sent to github on starting the app
-  if(localStorage.getItem(localStorageKey) != undefined){
-    syncLocalWithServer()
-  }
+  // //makes sure that the most recent PUT state gets sent to github on starting the app
+  // if(localStorage.getItem(localStorageKey) != undefined){
+  //   syncLocalWithServer()
+  // }
 }
 
 
