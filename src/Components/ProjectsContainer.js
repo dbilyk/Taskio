@@ -40,12 +40,14 @@ class ProjectsContainer extends Component {
     this.addNewTask = this.addNewTask.bind(this)
   }
 
-  
   componentWillMount(){
     //fetch tasks from github
-    API.GET().then((data)=>{
-      this.setState(JSON.parse(data))
-    })
+    API.PUT(this.defaultState)
+    // API.GET().then((data)=>{
+    //   this.setState(JSON.parse(data))
+    // })
+    
+  
   }
 
   addNewTask(){
@@ -73,7 +75,7 @@ class ProjectsContainer extends Component {
 
 
     return taskObject
-  }
+    }
 
   toggleZen(){
     

@@ -22,8 +22,8 @@ function API(){
 
 
   this.PUT = (state)=>{
-    //set local state every time stuff is updated on server
-    localStorage.setItem(localStorageKey, JSON.stringify(state))
+    // //set local state every time stuff is updated on server
+    // localStorage.setItem(localStorageKey, JSON.stringify(state))
 
     return this.GET(false).then(
       (data)=>{

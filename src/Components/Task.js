@@ -123,7 +123,7 @@ let Task = (
         </a>
 
         <input 
-          className={classes.pointsField + (points!="")?"": " "+ classes.hide} 
+          className={(points!="")?classes.pointsField: classes.pointsField + " "+ classes.hide} 
           type="text" 
           value={points}
           placeholder="pts"
