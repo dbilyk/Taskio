@@ -63,7 +63,7 @@ const styles = {
     borderRadius:"8px",
     border:"1px solid #eee",
     textAlign:"center",
-    margin:'0 20px'
+    marginRight:'20px'
   },
   grabberIcon:{
     width:'16px',
@@ -87,9 +87,9 @@ let Task = (
     points, 
     due,
     id,
-    isComplete, 
-    isExpanded, 
-    isShowing,
+    isComplete,
+    footerIsShowing,
+    actionMenuIsOpen,
     zenEnabled,
     tags
   }) => {
@@ -122,22 +122,33 @@ let Task = (
           <img className = {classes.grabberIcon} src={grabberIconURL} alt=""/>
         </a>
 
-        <FooterButton 
-          text="Add Tags" 
-          iconURL={tagIconURL}
-          isShowing= {!zenEnabled && due}
-          callback={()=>{console.log("tag adder id:"+id)}}
+        <input 
+          className={classes.pointsField + (points!="")?"": " "+ classes.hide} 
+          type="text" 
+          value={points}
+          placeholder="pts"
         />
 
         <FooterButton 
           text={due} 
           iconURL={timeIconURL}
-          isShowing= {!zenEnabled && due}
+          isShowing= {due}
           callback={()=>{console.log("date picker")}}
         />
 
-        <input className={classes.pointsField} type="text" placeholder="pts"></input>
-        
+        <FooterButton 
+          text="Add Tags" 
+          iconURL={tagIconURL}
+          isShowing= {tags.length > 1}
+          callback={()=>{console.log("tag adder id:"+id)}}
+        />
+
+        <FooterButton
+          text = {(footerIsShowing)?"Less":"More"}
+          iconURL ="#"
+          isShowing={true}
+          callback={()=>{console.log("more/less clicked")}}
+        />
       </div>
     </div>
   );

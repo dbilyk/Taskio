@@ -53,10 +53,6 @@ function API(){
       return response.json()
     })
     .then((data)=>{
-      //if were requesting github content, decode and parse that, otherwise, just parse the response JSON (to grab SHA)
-      return data.sha
-    })
-    .then((shaFileKey)=>{
       fetch(pathToTaskDataFile,{
       method     : "PUT",
       mode       : "cors",
@@ -69,14 +65,15 @@ function API(){
           "email": "auto@auto.com"
         },
         "content": btoa(JSON.stringify(localStorage.getItem(localStorageKey))),
-        "sha"    : shaFileKey
+        "sha"    : data.sha
         })
       })
     })
   }
+  
 
   //makes sure that the most recent PUT state gets sent to github on starting the app
-  if(JSON.parse(localStorage.getItem(localStorageKey))){
+  if(localStorage.getItem(localStorageKey) != undefined){
     syncLocalWithServer()
   }
 }

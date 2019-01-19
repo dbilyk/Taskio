@@ -17,7 +17,7 @@ const defaultState = {
   //projects array
   projects:[
     {
-      id:0,
+      id:1,
       title:"Demo Project",
       zenEnabled: false
     }
@@ -62,16 +62,15 @@ class ProjectsContainer extends Component {
       text:"Demo Task", 
       description:"", 
       points:"",
-      tags:"Add Tag",
+      tags:["Add Tag"],
       due:"Add Date",
       isComplete:false, 
-      isExpanded:false, 
-      isShowing:true,
-      zenEnabled:false,
+      footerIsShowing: true,
+      actionMenuIsOpen: true
     }
 
-    this.setState({tasks:[taskObject,...this.state.tasks]})
-    API.PUT(this.state)
+    this.setState({tasks:[taskObject,...this.state.tasks]},(state)=>{API.PUT(state)})
+
 
     return taskObject
   }
