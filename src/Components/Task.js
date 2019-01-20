@@ -10,7 +10,8 @@ const styles = {
     backgroundColor:"#fafafa",
     borderRadius:"8px",
     margin: "8px",
-    boxShadow:"1px 4px 20px 0 #ccc"
+    boxShadow:"1px 4px 20px 0 #ccc",
+    transition:"boxShadow 0.2s ease-in-out"
     
   },
   checkmarkDiv:{
@@ -43,7 +44,10 @@ const styles = {
   footerRow:{
     display:"flex",
     alignItems:"center",
-    flexFlow:"space-between"
+    flexFlow:"space-between",
+    maxHeight:'40px',
+    transition:"all 0.2s ease-in-out",
+    opacity:"1"
     
   },
   pointsField:{
@@ -73,10 +77,21 @@ const styles = {
     
   },
   hide:{
-    display:"none"
+    maxHeight:'0px',
+    opacity:"0",
+    transition:"all 0.2s ease-in-out",
+    //display:"none"
   },
   footerSpacer:{
     flex:'10 1 auto'
+  },
+  completedTask:{
+    "& textarea":{
+      color:'#aaa',
+      transition:"color 0.2s ease-in-out"
+    },
+    boxShadow:"0 0 0 0 #0000",
+    transition:"boxShadow 0.2s ease-in-out"
   }
   
 }
@@ -114,26 +129,31 @@ let Task = (
   let grabberIconURL = root + URLs.iconURL.grabber
   let deleteIconURL = root + URLs.iconURL.deleteTask
 
-  let footerClasses = (zenEnabled)?classes.footerRow + " " +classes.hide:classes.footerRow
+  let footerClasses = (zenEnabled || isComplete)?classes.footerRow + " " +classes.hide:classes.footerRow
+  let markedCompleteStyles = " " + ((isComplete)?classes.completedTask:"")
+
 
   return (  
-    <div className = {classes.taskContainer} >
+    <div className = {classes.taskContainer + markedCompleteStyles} >
       <div className = {classes.taskRow}>
 
         <div className = {classes.checkmarkDiv} onClick={()=>{onComplete(id)}}>
           {(isComplete)?(<img className = {classes.completedIcon} src = {completedIconURL} alt =""/>):<i></i>}
         </div>
 
-        <TextArea
-          rows="1"
-          onChange={(e)=>{onEditContent(e, id)}}
-          value = {text}
-        >
-          
-        </TextArea>
+        <div className={markedCompleteStyles}>
+          <TextArea
+            rows="1"
+            onChange={(e)=>{onEditContent(e, id)}}
+            value = {text}
+          ></TextArea>
+        </div>
 
       </div>
-      <div className={classes.dividerLine}></div>
+
+
+      <div className={classes.dividerLine + ((isComplete)?" " + classes.hide:"")}></div>
+
 
       <div className = {footerClasses}>
 
@@ -163,13 +183,15 @@ let Task = (
           callback={()=>{onEditTags(id)}}
         />
 
-        <FooterButton
-          text = {(actionMenuIsOpen)?"Less":"•••"}
-          iconURL ="#"
+        <div
           isShowing={true}
-          callback={()=>{onToggleActionMenu(id)}}
-        />
+          onClick={()=>{console.log(onToggleActionMenu);onToggleActionMenu(id)}}
+        >
+          {(actionMenuIsOpen)?"Less":"•••"}
+        </div>
+
         <div className={classes.footerSpacer}></div>
+
         <button 
         className={classes.deleteIcon} 
         onClick={()=>{onDeleteTask(id)}}>

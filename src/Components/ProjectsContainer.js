@@ -65,7 +65,7 @@ class ProjectsContainer extends Component {
   }
 
   componentWillMount(){
-    API.PUT(this.defaultState)
+    API.GET().then((data=>{this.setState(data)}))
 
 
     //fetch tasks from github
@@ -115,7 +115,6 @@ class ProjectsContainer extends Component {
     }
 
     let newState = this.state
-    console.log(newTaskId)
     newState.tasks[newTaskId] = taskObject
 
     this.setState({...newState},

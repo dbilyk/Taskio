@@ -13,7 +13,7 @@ const styles = {
     overflow:'hidden',
     backgroundColor:'#0000',
     fontFamily:"Arial",
-    fontSize:"16px",
+    fontSize:"14px",
     fontWeight:"800",
     transition:"height 0.15s ease-in-out",
     margin:"12px 12px 8px 12px",
