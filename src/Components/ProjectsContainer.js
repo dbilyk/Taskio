@@ -19,7 +19,7 @@ class ProjectsContainer extends Component {
       //projects array
       projects:[
         {
-          id        : 1,
+          id        : 0,
           title     : "Demo Project",
           zenEnabled: false
         }
@@ -27,10 +27,29 @@ class ProjectsContainer extends Component {
     
       //tasks array
       tasks:{
-
+        0:{
+          id              : 0,
+          owningProjectId : 0,
+          index: 0,
+          text            : "The cat sat on a matThe cat sat on a matThe cat sat on a matThe cat sat on a matThe cat sat on a matThe cat sat on a mat",
+          description     : "",
+          points          : "",
+          tags            : ["Add Tag"],
+          dueDate         : "Add Date",
+          isComplete      : false,
+          footerIsShowing : true,
+          actionMenuIsOpen: true,
+          //event handlers
+          onComplete        : this.onComplete.bind(this),
+          onEditContent     : this.onEditContent.bind(this),
+          onDeleteTask      : this.onDeleteTask.bind(this),
+          onDrag            : this.onDrag.bind(this),
+          onEditDate        : this.onEditDate.bind(this),
+          onEditPoints      : this.onEditPoints.bind(this),
+          onEditTags        : this.onEditTags.bind(this),
+          onToggleActionMenu: this.onToggleActionMenu.bind(this)
+        }
       }
-        
-      ]
     }
     this.state = defaultState
 
@@ -57,24 +76,34 @@ class ProjectsContainer extends Component {
   
   }
 
-  addNewTask(){
-    let findHighestId = (taskArray)=>{
-      return taskArray.reduce((acc,current)=>{
-        if (acc >= current.id) return acc
-        else return current.id
-      },-1)
+
+  findHighestId(taskObj){
+    let taskKeys = Object.keys(taskObj)
+    if(taskKeys.length == 0){
+      return -1
     }
+    return Object.keys(taskObj).reduce((acc,currentKey)=>{
+      if (parseFloat(acc) >= parseFloat(currentKey)) return parseFloat(acc)
+      else return parseFloat(currentKey)
+    },"-1")
+  }
+
+  addNewTask(){
+    let newTaskId = this.findHighestId(this.state.tasks) + 1
 
     let taskObject = {
-      owningProjectId   : this.state.currentProjectId,
-      text              : "Demo Task",
-      description       : "",
-      points            : "0",
-      tags              : ["Add Tag"],
-      due               : "Add Date",
-      isComplete        : false,
-      footerIsShowing   : true,
-      actionMenuIsOpen  : true,
+      id              : newTaskId,
+      owningProjectId : this.state.currentProjectId,
+      index: 0,
+      text            : "Demo Task",
+      description     : "",
+      points          : "",
+      tags            : ["Add Tag"],
+      dueDate         : "Add Date",
+      isComplete      : false,
+      footerIsShowing : true,
+      actionMenuIsOpen: true,
+      //event handlers
       onComplete        : this.onComplete.bind(this),
       onEditContent     : this.onEditContent.bind(this),
       onDeleteTask      : this.onDeleteTask.bind(this),
@@ -86,10 +115,10 @@ class ProjectsContainer extends Component {
     }
 
     let newState = this.state
-    newState.tasks[findHighestId(Object.keys(this.state.tasks))+1]
+    console.log(newTaskId)
+    newState.tasks[newTaskId] = taskObject
 
-    this.setState({
-      tasks:this.state.tasks,
+    this.setState({...newState},
       ()=>{
         API.PUT(this.state)
       })
@@ -99,7 +128,9 @@ class ProjectsContainer extends Component {
     }
 
     onComplete(taskID){
-      console.log('onComplete' + taskID)
+      let newState = {...this.state}
+      newState.tasks[taskID].isComplete = !newState.tasks[taskID].isComplete
+      this.setState(newState)
     }
     onEditDate(taskID){
       console.log('onEditDate:'+ taskID)
@@ -107,18 +138,27 @@ class ProjectsContainer extends Component {
     onEditTags(taskID){
       console.log('onEditTags:'+ taskID)
     }
-    onEditPoints(taskID){
-      console.log('onEditPoints:'+ taskID)
+    onEditPoints(event,taskID){
+      let newState = {...this.state}
+      newState.tasks[taskID].points = event.target.value
+      this.setState(newState)
     }
     onEditContent(event,taskID){
-      console.log('onEditContent:'+ taskID)
+      let newState = {...this.state}
+      newState.tasks[taskID].text = event.target.value
+      this.setState(newState)
 
-      console.log(event.target.value)
     }
     onDeleteTask(taskID){
-      console.log('onDeleteTask:'+ taskID)
+      let newState = {...this.state}
+      delete(newState.tasks[taskID])
+      this.setState(newState)
+
     }
     onToggleActionMenu(taskID){
+      let newState = {...this.state}
+      newState.tasks[taskID].actionMenuIsOpen = !newState.tasks[taskID].actionMenuIsOpen
+      this.setState(newState)
       console.log('onToggleActionMenu:'+ taskID)
     }
     onDrag(taskID){
@@ -129,13 +169,14 @@ class ProjectsContainer extends Component {
 
 
   render() { 
+    let tasks = this.state.tasks
     return (  
       <div className = {this.props.classes.taskContainer}>
-      <div onClick   = {this.addNewTask}>++ ADD</div>
+      <div onClick   = {this.addNewTask}>Add Task</div>
         {
-          this.state.tasks.map((e)=>{
-            if(e.owningProjectId ==this.state.currentProjectId){
-              return <Task {...e} key = {e.id}/>
+          Object.keys(tasks).map((e)=>{
+            if(tasks[e].owningProjectId == this.state.currentProjectId){
+              return <Task {...tasks[e]} key = {tasks[e].id}/>
             }
             return
           })

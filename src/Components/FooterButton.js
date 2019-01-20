@@ -24,7 +24,7 @@ const styles = {
     fontSize:"12px"
   },
   hide:{
-    display:"hidden"
+    display:"none"
   }
   
 }
@@ -39,11 +39,11 @@ let FooterButton = (
     isShowing,
     callback
   }) => {
-    
+    console.log(isShowing)
   
   return (  
     <button 
-      className={classes.footerBtnContainer}
+      className={classes.footerBtnContainer+ " " + ((!isShowing)?classes.hide:"")}
       onClick={callback}
     >
       <img className={classes.footerBtnIcon} src = {iconURL} alt="" />

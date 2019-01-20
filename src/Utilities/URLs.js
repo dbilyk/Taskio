@@ -8,6 +8,7 @@ let strings = {
     filters:"/img/icon/filters.png",
     grabber:"/img/icon/grabber.png",
     incompleteTask:"/img/icon/incomplete-task.png",
+    deleteTask:"/img/icon/delete-task.png",
     menu:"/img/icon/menu.png",
     tag:"/img/icon/tag.png",
     time:"/img/icon/time.png",
