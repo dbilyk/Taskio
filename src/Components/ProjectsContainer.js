@@ -10,14 +10,17 @@ import Title from './Title';
 
 const styles = {
   taskContainer:{
-    
+    overflow:"hidden"
   }
 }
+
+let taskRefs = {}
 
 class ProjectsContainer extends Component {
   constructor(props) {
     super(props);
     const defaultState = {
+      debug:"debug",
       //which project is currently open
       currentProjectId: 0,
     
@@ -42,6 +45,7 @@ class ProjectsContainer extends Component {
     this.state = defaultState
 
     //bind stuff
+    this.populateTaskRefs = this.populateTaskRefs.bind(this)
     this.getTaskSortIndex = this.getTaskSortIndex.bind(this)
     this.moveTask = this.moveTask.bind(this)
     this.attachCallbacksToObject = this.attachCallbacksToObject.bind(this)
@@ -53,23 +57,28 @@ class ProjectsContainer extends Component {
     this.onEditDate         = this.onEditDate.bind(this)
     this.onDeleteTask       = this.onDeleteTask.bind(this)
     this.onToggleActionMenu = this.onToggleActionMenu.bind(this)
-    this.onDrag             = this.onDrag.bind(this)
+    this.onDragging         = this.onDragging.bind(this)
+    this.onDragOver         = this.onDragOver.bind(this)
     this.onToggleZen        = this.onToggleZen.bind(this)
   }
 
   componentWillMount(){
     //resets the server state to default state object for testing
-    API.PUT(this.state)
+    //API.PUT(this.state)
 
     API.GET().then(
       data=>{
         let serverStateWithCallbacks = this.attachCallbacksToAllTasks(data)
-        this.setState(
-          serverStateWithCallbacks,
-          ()=>{}
-        )
+
+        //we need to get all refs to actual dom nodes to enable dragndrop reordering
+        this.populateTaskRefs(serverStateWithCallbacks)
+
+        this.setState(serverStateWithCallbacks)
       }
     )
+
+    window.addEventListener('touchmove', {passive: false});
+
     // //fetch tasks from github
     // API.GET().then((data)=>{
     //   this.setState(data)
@@ -133,6 +142,9 @@ class ProjectsContainer extends Component {
       
     }
 
+    //add React ref to id key
+    taskRefs[newTaskId] = React.createRef()
+
     let newState = this.state
     newState.tasks[newTaskId] = taskObject
     newState.tasks[newTaskId] = this.attachCallbacksToObject(taskObject)
@@ -157,7 +169,7 @@ class ProjectsContainer extends Component {
         onComplete        : this.onComplete.bind(this),
         onEditContent     : this.onEditContent.bind(this),
         onDeleteTask      : this.onDeleteTask.bind(this),
-        onDrag            : this.onDrag.bind(this),
+        onDragging        : this.onDragging.bind(this),
         onEditDate        : this.onEditDate.bind(this),
         onEditPoints      : this.onEditPoints.bind(this),
         onEditTags        : this.onEditTags.bind(this),
@@ -167,6 +179,13 @@ class ProjectsContainer extends Component {
       newObj = {...newObj, ...handlers}
       
       return newObj
+    }
+
+    populateTaskRefs(state){
+      Object.keys(state.tasks).forEach(e=>{
+        console.log(e)
+        taskRefs[e] = React.createRef()
+      })
     }
 
     getCurrentProject(){
@@ -232,7 +251,7 @@ class ProjectsContainer extends Component {
     onEditContent(event,taskID){
       let newState = {...this.state}
       newState.tasks[taskID].text = event.target.value
-      this.setState(newState)
+      this.setState(newState,()=>{console.log(this.state)})
 
     }
     onDeleteTask(taskID){
@@ -242,7 +261,10 @@ class ProjectsContainer extends Component {
       //need to remove from sorting list
       let taskSortingIndex = currentProject.sortOrder.findIndex(e=>e==taskID)
       currentProject.sortOrder.splice(taskSortingIndex,1)
+
       delete(newState.tasks[taskID])
+      //remove the ref to this task
+      delete(taskRefs[taskID])
       this.setState(newState)
 
     }
@@ -251,9 +273,6 @@ class ProjectsContainer extends Component {
       newState.tasks[taskID].actionMenuIsOpen = !newState.tasks[taskID].actionMenuIsOpen
       this.setState(newState)
       console.log('onToggleActionMenu:'+ taskID)
-    }
-    onDrag(taskID){
-      console.log('onDrag:'+ taskID)
     }
     onToggleZen(){
       let newState = {...this.state}
@@ -269,11 +288,85 @@ class ProjectsContainer extends Component {
       this.setState(newState)
     }      
 
+    blockScroll(){
+
+    }
+
+    //called by the element being dragged takes event, ref to node, and taskID
+    onDragging(e, taskID){
+      e.preventDefault()
+      e.stopPropagation()
+      e.returnValue = false
+
+      let cursorY = e.clientY || ((e.touches != undefined)?e.touches[0].pageY:null)
+      //on mouseupevent, the clientX is zero which causes an element to be inserted at the top if we don't return...
+      if(cursorY == 0 || cursorY == null){
+        return
+      }
+
+      let projectId = this.state.currentProjectId
+      let taskCount = this.getTaskCount()
+      let currentSortOrder = this.state.projects[projectId].sortOrder
+      let currentNodeIndex = currentSortOrder.findIndex(e=>e ==taskID)
+
+      //do nothing if were dragging above the first task
+      if(currentNodeIndex == 0){
+        if(taskRefs[taskID].current.offsetTop >= cursorY){
+          return
+        }
+      }
+
+      //do nothing if were dragging below the last task
+      if(currentNodeIndex == taskCount-1 || taskCount == 1){
+        if(taskRefs[taskID].current.offsetTop <= cursorY){
+          return
+        } 
+      }
+
+      let upperNodeID = currentSortOrder[currentNodeIndex-1] 
+      let lowerNodeID = currentSortOrder[currentNodeIndex+1] 
+
+      //dragging will update these variables
+      let newSortOrder = [...currentSortOrder]
+      let newState = null
+
+      //if dragging task upwards
+      if(currentNodeIndex != 0 && taskRefs[upperNodeID].current.offsetTop >= cursorY){
+
+        newSortOrder.splice(currentNodeIndex,1)
+        newSortOrder.splice(currentNodeIndex-1,0,taskID)
+        newState = {...this.state}
+        newState.projects[projectId].sortOrder = newSortOrder
+        
+        this.setState(newState)
+      }
+
+
+      if(currentNodeIndex != taskCount - 1 && taskRefs[lowerNodeID].current.offsetTop <= cursorY){
+
+        newSortOrder.splice(currentNodeIndex,1)
+        newSortOrder.splice(currentNodeIndex+1,0,taskID)
+        newState = {...this.state}
+        newState.projects[projectId].sortOrder = newSortOrder
+        this.setState(newState)
+      }
+      
+
+
+    }
+
+    //called by the element that is droppable
+    onDragOver(e){
+
+    }
+
   render() { 
     let tasks = this.state.tasks
     return (  
-      <div className = {this.props.classes.taskContainer}>
-
+      <div 
+        className = {this.props.classes.taskContainer}
+      >
+      {/* {this.state.debug} */}
       <Title text = {this.state.projects[this.state.currentProjectId].title}/>
 
       <ProjectButtonRow>
@@ -290,7 +383,7 @@ class ProjectsContainer extends Component {
           isActive = {this.state.projects[this.state.currentProjectId].zenActive}// this.state.projects[this.state.currentProjectId].zenActive}
         />
         <ProjectButton 
-          callback={()=>{this.moveTask("0",2)}}
+          callback={()=>{}}
           text="Filters"
           iconURL = {URLs.iconURL.filters}
           isActive = {this.state.projects[this.state.currentProjectId].filterActive}
@@ -300,11 +393,15 @@ class ProjectsContainer extends Component {
       
         {
           this.getCurrentProject().sortOrder.map((ID)=>{
-            
+            //the ref object gets created and destroed as tasks get added and removed.
+            //the ref is assigned below
+            let domRef = taskRefs[ID]
+           
             if(tasks[ID].owningProjectId == this.state.currentProjectId){
-              return <Task {...tasks[ID]} />
+              return <Task innerRef={domRef} {...tasks[ID]} />
             }
             return
+          
           })
         }
         

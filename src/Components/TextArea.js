@@ -8,7 +8,7 @@ const styles = {
     flex:"1 1 100vw"
   },
   titleField:{
-    color:"#555",
+    color:"#333",
     width:'94%',
     resize:"vertical",
     overflow:'hidden',
@@ -17,7 +17,7 @@ const styles = {
     fontSize:"14px",
     fontWeight:"800",
     transition:"height 0.15s ease-in-out",
-    margin:"12px 12px 8px 12px",
+    margin:"8px 12px 4px 8px",
     minHeight: '20px',
     flex:'1 0 100vw',
     border:"none",
@@ -94,7 +94,6 @@ class Textarea extends React.Component {
           id="textarea"
           autoFocus={true}
           defaultValue={value}
-          placeholder="New task..."
           style={{
             height,
             resize: isOneLine ? "none" : null

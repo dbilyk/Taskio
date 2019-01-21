@@ -33,7 +33,8 @@ let styles={
     transition:"border 0.1s ease-in-out",
   },
   enabled:{
-    backgroundColor:"#0f53"
+    backgroundColor:"#235AD1",
+    color:"#fff"
   },
   
 }

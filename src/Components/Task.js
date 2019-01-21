@@ -8,9 +8,10 @@ import injectSheet from "react-jss"
 const styles = {
   taskContainer:{
     backgroundColor:"#fff",
+    border:"1px solid #ddd",
     borderRadius:"8px",
     margin: "8px",
-    boxShadow:"1px 4px 20px 0 #ccc",
+    boxShadow:"1px 1px 3px 0 #0005",
     transition:"box-shadow 0.2s ease-in-out"
     
   },
@@ -21,7 +22,7 @@ const styles = {
     height:'20px',
     border:"1px solid #eee",
     borderRadius:"30px",
-    margin:'12px 8px 8px 12px',
+    margin:'8px 12px 8px 8px',
 
 
   },
@@ -67,8 +68,10 @@ const styles = {
     width:'16px',
     height:'8px',
     opacity:"0.2",
-    margin: "0 22px 0 12px"
+    margin: "0 22px 0 12px",
+    touchAction:"none"
   },
+
   deleteIcon:{
     "& img":{
       width:"16px",
@@ -88,6 +91,9 @@ const styles = {
     opacity:"0",
     transition:"all 0.2s ease-in-out",
     //display:"none"
+  },
+  quickHide:{
+    display:"none"
   },
   footerSpacer:{
     flex:'10 1 auto'
@@ -115,8 +121,8 @@ const styles = {
 }
 
 
-let Task = (
-  {
+let Task = React.forwardRef(
+  ({
     classes, 
     text, 
     points, 
@@ -132,12 +138,10 @@ let Task = (
     onEditDate,
     onEditPoints,
     onEditTags,
-    onDrag,
+    onDragging,
     onEditContent,
     onDeleteTask
-  }) => {
-
-
+  },ref) => {
   let root = window.location.origin
   let timeIconURL = root + URLs.iconURL.time
   let tagIconURL = root + URLs.iconURL.tag
@@ -150,31 +154,51 @@ let Task = (
 
 
   return (  
-    <div className = {classes.taskContainer + markedCompleteStyles} >
+    <div 
+      ref = {ref}
+      draggable
+      className = {classes.taskContainer + markedCompleteStyles}
+      onDrag={(e)=>{onDragging(e,id)}}
+      onTouchMove={(e)=>{onDragging(e,id)}}
+    >
       <div className = {classes.taskRow}>
 
         <div className = {classes.checkmarkDiv} onClick={()=>{onComplete(id)}}>
           {(isComplete)?(<img className = {classes.completedIcon} src = {completedIconURL} alt =""/>):<i></i>}
         </div>
 
-        {/* <div className={markedCompleteStyles}> */}
-          <TextArea
-            rows="1"
-            onChange={(e)=>{onEditContent(e, id)}}
-            value = {text}
-          ></TextArea>
-        {/* </div> */}
+        
+        <TextArea
+          rows="1"
+          onChange={(e)=>{onEditContent(e, id)}}
+          value = {text}
+        ></TextArea>
+        
+
+        <button 
+        className={classes.deleteIcon + " " + ((isComplete || zenEnabled)?"":classes.quickHide)} 
+        onClick={()=>{onDeleteTask(id)}}>
+          <img src={deleteIconURL} alt="delete action" />
+        </button>
 
       </div>
 
 
-      <div className={classes.dividerLine + ((isComplete)?" " + classes.hide:"")}></div>
+      <div className={classes.dividerLine + ((isComplete || zenEnabled)?" " + classes.hide:"")}></div>
 
 
       <div className = {footerClasses}>
 
         <a href="#">
-          <img className = {classes.grabberIcon} src={grabberIconURL} alt=""/>
+          <img className = {classes.grabberIcon} 
+            draggable= {false} 
+            src={grabberIconURL} 
+            alt=""
+            onTouchStart={(e)=>{
+              e.preventDefault()
+              onDragging(e,id)
+            }}
+          />
         </a>
 
         <input 
@@ -220,7 +244,7 @@ let Task = (
   );
   
 
-}
+})
   
  
 export default injectSheet(styles)(Task);
