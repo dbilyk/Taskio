@@ -7,11 +7,11 @@ import injectSheet from "react-jss"
 
 const styles = {
   taskContainer:{
-    backgroundColor:"#fafafa",
+    backgroundColor:"#fff",
     borderRadius:"8px",
     margin: "8px",
     boxShadow:"1px 4px 20px 0 #ccc",
-    transition:"boxShadow 0.2s ease-in-out"
+    transition:"box-shadow 0.2s ease-in-out"
     
   },
   checkmarkDiv:{
@@ -34,7 +34,7 @@ const styles = {
   taskRow:{
     display:"flex",
     flexFlow:"row nowrap",
-    justifyContent:"flex-start",
+    justifyContent:"space-between",
     
   },
   dividerLine:{
@@ -45,9 +45,13 @@ const styles = {
     display:"flex",
     alignItems:"center",
     flexFlow:"space-between",
-    maxHeight:'40px',
-    transition:"all 0.2s ease-in-out",
-    opacity:"1"
+    minHeight:'30px',
+    maxHeight:'30px',
+    transition:"all 0.15s ease-in-out",
+    opacity:"1",
+    "& div, textarea, input":{
+      transition:"all 0.15s ease-in-out", 
+    }
     
   },
   pointsField:{
@@ -77,7 +81,10 @@ const styles = {
     
   },
   hide:{
-    maxHeight:'0px',
+    minHeight:'0px',
+    maxHeight: "0px",
+    margin:"0px",
+    width:"0px",
     opacity:"0",
     transition:"all 0.2s ease-in-out",
     //display:"none"
@@ -91,7 +98,18 @@ const styles = {
       transition:"color 0.2s ease-in-out"
     },
     boxShadow:"0 0 0 0 #0000",
-    transition:"boxShadow 0.2s ease-in-out"
+    transition:"box-shadow 0.2s ease-in-out",
+    "& $footerRow":{
+      transition:"max-height 0.2s ease-in-out", 
+    }
+  },
+  showHideBtn:{
+    color:"#999",
+    alignSelf:"center",
+    fontSize:"12px",
+    
+
+
   }
   
 }
@@ -100,9 +118,7 @@ const styles = {
 let Task = (
   {
     classes, 
-    children, 
     text, 
-    description, 
     points, 
     dueDate,
     id,
@@ -141,13 +157,13 @@ let Task = (
           {(isComplete)?(<img className = {classes.completedIcon} src = {completedIconURL} alt =""/>):<i></i>}
         </div>
 
-        <div className={markedCompleteStyles}>
+        {/* <div className={markedCompleteStyles}> */}
           <TextArea
             rows="1"
             onChange={(e)=>{onEditContent(e, id)}}
             value = {text}
           ></TextArea>
-        </div>
+        {/* </div> */}
 
       </div>
 
@@ -184,10 +200,11 @@ let Task = (
         />
 
         <div
+          className={classes.showHideBtn}
           isShowing={true}
-          onClick={()=>{console.log(onToggleActionMenu);onToggleActionMenu(id)}}
+          onClick={()=>{console.log(onToggleActionMenu); onToggleActionMenu(id)}}
         >
-          {(actionMenuIsOpen)?"Less":"•••"}
+          {(actionMenuIsOpen)?"◀":"•••"}
         </div>
 
         <div className={classes.footerSpacer}></div>

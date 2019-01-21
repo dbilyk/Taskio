@@ -10,11 +10,12 @@ const styles = {
     height:"30px",
     width: "90px",
     backgroundColor:"#FFF0",
-    border:"none"
+    border:"none",
   },
   footerBtnIcon:{
     width:"12px",
     height:"12px",
+    flex:"0 1 auto",
     alignSelf:"flex-start",
     marginRight:"4px",
   },
@@ -39,7 +40,6 @@ let FooterButton = (
     isShowing,
     callback
   }) => {
-    console.log(isShowing)
   
   return (  
     <button 

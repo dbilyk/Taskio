@@ -4,11 +4,12 @@ const DEFAULT_HEIGHT = 20;
 
 const styles = {
   container: {
-    position: 'relative'
+    position: 'relative',
+    flex:"1 1 100vw"
   },
   titleField:{
     color:"#555",
-    width:'80vw',
+    width:'94%',
     resize:"vertical",
     overflow:'hidden',
     backgroundColor:'#0000',
@@ -18,7 +19,7 @@ const styles = {
     transition:"height 0.15s ease-in-out",
     margin:"12px 12px 8px 12px",
     minHeight: '20px',
-    flex:'1 0 auto',
+    flex:'1 0 100vw',
     border:"none",
     "&:focus":{
       outline:"none"
@@ -93,12 +94,14 @@ class Textarea extends React.Component {
           id="textarea"
           autoFocus={true}
           defaultValue={value}
+          placeholder="New task..."
           style={{
             height,
             resize: isOneLine ? "none" : null
           }}
           onChange={this.setValue}
           onKeyUp={this.setFilledTextareaHeight}
+          
         />
       </div>
     );
