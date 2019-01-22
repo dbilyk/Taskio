@@ -8,11 +8,12 @@ import injectSheet from "react-jss"
 const styles = {
   taskContainer:{
     backgroundColor:"#fff",
+    opacity:"1",
     border:"1px solid #ddd",
     borderRadius:"8px",
-    margin: "8px",
-    boxShadow:"1px 1px 3px 0 #0005",
-    transition:"box-shadow 0.2s ease-in-out"
+    margin: "8px 8px",
+    boxShadow:"0px 1px 1px 0 #0001",
+    transition:"all 0.2s ease-in-out"
     
   },
   checkmarkDiv:{
@@ -20,7 +21,7 @@ const styles = {
     justifyContent:"center",
     width:'20px',
     height:'20px',
-    border:"1px solid #eee",
+    border:"1px solid #ccc",
     borderRadius:"30px",
     margin:'8px 12px 8px 8px',
 
@@ -83,6 +84,15 @@ const styles = {
     textAlign:"right"
     
   },
+  closeChevronIcon:{
+    width:"6px",
+    height:'10px',
+    flex:"0 0 auto",
+    backgroundColor:'#0000',
+    border:'none',
+    textAlign:"right"
+    
+  },
   hide:{
     minHeight:'0px',
     maxHeight: "0px",
@@ -113,9 +123,11 @@ const styles = {
     color:"#999",
     alignSelf:"center",
     fontSize:"12px",
-    
-
-
+  },
+  isDragging:{
+    margin:"20px 8px",
+    opacity:'0',
+    transition:"opacity, margin 0.2s ease-in-out"
   }
   
 }
@@ -129,6 +141,7 @@ let Task = React.forwardRef(
     dueDate,
     id,
     isComplete,
+    isDragging,
     footerIsShowing,
     actionMenuIsOpen,
     zenEnabled,
@@ -139,6 +152,7 @@ let Task = React.forwardRef(
     onEditPoints,
     onEditTags,
     onDragging,
+    onDragEnd,
     onEditContent,
     onDeleteTask
   },ref) => {
@@ -151,15 +165,19 @@ let Task = React.forwardRef(
 
   let footerClasses = (zenEnabled || isComplete)?classes.footerRow + " " +classes.hide:classes.footerRow
   let markedCompleteStyles = " " + ((isComplete)?classes.completedTask:"")
+  let draggingStyles = " " + ((isDragging)?classes.isDragging:"") 
 
 
   return (  
     <div 
       ref = {ref}
       draggable
-      className = {classes.taskContainer + markedCompleteStyles}
+      className = {classes.taskContainer + markedCompleteStyles + draggingStyles}
       onDrag={(e)=>{onDragging(e,id)}}
       onTouchMove={(e)=>{onDragging(e,id)}}
+
+      onDragEnd={(e)=>{onDragEnd(e,id)}}
+      onTouchEnd={(e)=>{onDragEnd(e,id)}}
     >
       <div className = {classes.taskRow}>
 
@@ -170,7 +188,8 @@ let Task = React.forwardRef(
         
         <TextArea
           rows="1"
-          onChange={(e)=>{onEditContent(e, id)}}
+          id = {id}
+          onEditContent = {onEditContent}
           value = {text}
         ></TextArea>
         
@@ -228,7 +247,7 @@ let Task = React.forwardRef(
           isShowing={true}
           onClick={()=>{console.log(onToggleActionMenu); onToggleActionMenu(id)}}
         >
-          {(actionMenuIsOpen)?"◀":"•••"}
+          {(actionMenuIsOpen)?(<img className = {classes.closeChevronIcon} src={URLs.iconURL.chevron} alt="close icon"/>):"•••"}
         </div>
 
         <div className={classes.footerSpacer}></div>

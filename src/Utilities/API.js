@@ -5,6 +5,17 @@ function API(){
 
   let localStorageKey = "taskio/state"
 
+  let timeoutID
+  let timeoutDelay = 1500
+  let timeout = ()=>{
+    timeoutID = setTimeout(()=>{
+      console.log("sent another PUT")
+      _networkPUT(JSON.parse(localStorage.getItem(localStorageKey)))
+      timeoutSet = false
+    },timeoutDelay)
+  }
+  let timeoutSet = false
+
   this.GET = (isContentRequest=true)=>{
     return fetch(pathToTaskDataFile,{
       method: "GET"
@@ -20,11 +31,8 @@ function API(){
     })
   }
 
-
-  this.PUT = (state)=>{
-    // //set local state every time stuff is updated on server
-    // localStorage.setItem(localStorageKey, JSON.stringify(state))
-
+  let _networkPUT = (state)=>{
+    //do the request
     return this.GET(false).then(
       (data)=>{
         fetch(pathToTaskDataFile,{
@@ -42,6 +50,24 @@ function API(){
         })
       })
     })
+  }
+
+  this.PUT = (state)=>{
+    //set local state every time stuff is updated on server
+    localStorage.setItem(localStorageKey, JSON.stringify(state))
+
+    //only do a request if we don't have one queued up already.   
+    if(!timeoutSet){
+      timeoutSet = true
+
+      //do the request
+      _networkPUT(state)
+    }
+    else{
+      //reset the update interval to x seconds from this last request.
+      clearInterval(timeoutID)
+      timeout()
+    }
   }
 
   let syncLocalWithServer = ()=>{

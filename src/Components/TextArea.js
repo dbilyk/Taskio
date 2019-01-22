@@ -98,7 +98,12 @@ class Textarea extends React.Component {
             height,
             resize: isOneLine ? "none" : null
           }}
-          onChange={this.setValue}
+          onChange={
+            (e)=>{
+              this.setValue(e)
+              this.props.onEditContent(e,this.props.id)
+            }
+          }
           onKeyUp={this.setFilledTextareaHeight}
           
         />

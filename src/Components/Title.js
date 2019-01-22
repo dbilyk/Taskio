@@ -3,10 +3,10 @@ import injectStyles from "react-jss"
 
 const styles= {
   default:{
-    fontFamily:"helvetica",
+    fontFamily:"orbitron",
     fontSize:"30px",
     fontWeight:"800",
-    margin:"8px",
+    margin:"8px"
   }
 }
 

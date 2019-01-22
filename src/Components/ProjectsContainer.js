@@ -7,6 +7,7 @@ import Task from "./Task"
 import ProjectButtonRow from "./ProjectButtonRow"
 import ProjectButton from "./ProjectButton"
 import Title from './Title';
+import TitleRow from "./TitleRow"
 
 const styles = {
   taskContainer:{
@@ -58,8 +59,13 @@ class ProjectsContainer extends Component {
     this.onDeleteTask       = this.onDeleteTask.bind(this)
     this.onToggleActionMenu = this.onToggleActionMenu.bind(this)
     this.onDragging         = this.onDragging.bind(this)
-    this.onDragOver         = this.onDragOver.bind(this)
+    this.onDragEnd         = this.onDragEnd.bind(this)
     this.onToggleZen        = this.onToggleZen.bind(this)
+  }
+
+  componentDidUpdate(){
+    API.PUT(this.state)
+
   }
 
   componentWillMount(){
@@ -76,13 +82,7 @@ class ProjectsContainer extends Component {
         this.setState(serverStateWithCallbacks)
       }
     )
-
     window.addEventListener('touchmove', {passive: false});
-
-    // //fetch tasks from github
-    // API.GET().then((data)=>{
-    //   this.setState(data)
-    // })
   }
 
   //sorting logic------------------------------------------------------------------------------------------------
@@ -129,6 +129,7 @@ class ProjectsContainer extends Component {
       id              : newTaskId,
       key             : newTaskId,
       owningProjectId : this.state.currentProjectId,
+      isDragging      : false,
       text            : "",
       description     : "",
       points          : "",
@@ -152,10 +153,7 @@ class ProjectsContainer extends Component {
     //add new task to sorting order for rendering
     newState.projects[newState.currentProjectId].sortOrder.unshift(taskObject.id)
 
-    this.setState({...newState},
-      ()=>{
-        API.PUT(this.state)
-      })
+    this.setState({...newState})
 
 
     return taskObject
@@ -170,6 +168,7 @@ class ProjectsContainer extends Component {
         onEditContent     : this.onEditContent.bind(this),
         onDeleteTask      : this.onDeleteTask.bind(this),
         onDragging        : this.onDragging.bind(this),
+        onDragEnd        : this.onDragEnd.bind(this),
         onEditDate        : this.onEditDate.bind(this),
         onEditPoints      : this.onEditPoints.bind(this),
         onEditTags        : this.onEditTags.bind(this),
@@ -251,7 +250,7 @@ class ProjectsContainer extends Component {
     onEditContent(event,taskID){
       let newState = {...this.state}
       newState.tasks[taskID].text = event.target.value
-      this.setState(newState,()=>{console.log(this.state)})
+      this.setState(newState)
 
     }
     onDeleteTask(taskID){
@@ -309,6 +308,13 @@ class ProjectsContainer extends Component {
       let currentSortOrder = this.state.projects[projectId].sortOrder
       let currentNodeIndex = currentSortOrder.findIndex(e=>e ==taskID)
 
+      //let the task itself know that it's now dragging so it can apply appropriate styles.
+      if(!this.state.tasks[taskID].isDragging){
+        let newState = {...this.state}
+        newState.tasks[taskID].isDragging = true
+        this.setState(newState)
+      }
+      
       //do nothing if were dragging above the first task
       if(currentNodeIndex == 0){
         if(taskRefs[taskID].current.offsetTop >= cursorY){
@@ -331,7 +337,7 @@ class ProjectsContainer extends Component {
       let newState = null
 
       //if dragging task upwards
-      if(currentNodeIndex != 0 && taskRefs[upperNodeID].current.offsetTop >= cursorY){
+      if(currentNodeIndex != 0 && (taskRefs[upperNodeID].current.offsetTop + 40) >= cursorY){
 
         newSortOrder.splice(currentNodeIndex,1)
         newSortOrder.splice(currentNodeIndex-1,0,taskID)
@@ -342,7 +348,7 @@ class ProjectsContainer extends Component {
       }
 
 
-      if(currentNodeIndex != taskCount - 1 && taskRefs[lowerNodeID].current.offsetTop <= cursorY){
+      if(currentNodeIndex != taskCount - 1 && (taskRefs[lowerNodeID].current.offsetTop - 40) <= cursorY){
 
         newSortOrder.splice(currentNodeIndex,1)
         newSortOrder.splice(currentNodeIndex+1,0,taskID)
@@ -350,14 +356,13 @@ class ProjectsContainer extends Component {
         newState.projects[projectId].sortOrder = newSortOrder
         this.setState(newState)
       }
-      
-
-
     }
 
     //called by the element that is droppable
-    onDragOver(e){
-
+    onDragEnd(e,taskID){
+      let newState = {...this.state}
+      newState.tasks[taskID].isDragging = false
+      this.setState(newState)
     }
 
   render() { 
@@ -366,8 +371,11 @@ class ProjectsContainer extends Component {
       <div 
         className = {this.props.classes.taskContainer}
       >
-      {/* {this.state.debug} */}
-      <Title text = {this.state.projects[this.state.currentProjectId].title}/>
+      
+      <TitleRow>
+        <Title text = {this.state.projects[this.state.currentProjectId].title}/>
+        <img width="40px" height="40px" src={URLs.iconURL.menu} alt="menu icon"/>
+      </TitleRow>
 
       <ProjectButtonRow>
         <ProjectButton 
